@@ -1,4 +1,18 @@
+import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.4.3/dist/fuse.esm.js'
+
+/*An array containing all the names*/
+const integrations = ["Adaptive Insights","AdapTV","adjust","Adobe Ads","Adobe Analytics","Adquant","Adroll","Airtable","Amplitude","Anaplan","App Store Connect – Analytics","App Store Connect – Sales","Apple Search Ads","AppNexus","Appreciate","Appsee","AppsFlyer","Avantlink","Bing Ads","BlueSnap","Brandwatch","Cassandra","Cedato","Chargify","Convert Media","CouchBase","Crimson Hexagon","Criteo","Currency Service","Customer Gauge","Delta Projects","Display & Video 360","Docebo","DoubleClick","DoubleVerify","Facebook Ads","Facebook Audience Network","Facebook Social","FTP","GMP365","Google Ad Manager","Google Ads","Google AdWords","Google Analytics","Google Data Store","Google Email","Google Play","Google Sheets","Gothamads","Greenhouse","Harvest","HasOffers","HelpScout","Hubspot","Impact Radius","Index Exchange Client Audit Logs","Innovid","Insight Squared","Instagram","Intacct","Intercom","Jira","JW Player","JW Player Analytics","Keepcon","Klaviyo","Kochava","Linkedin Ads","Linkedin Social","LKQD","Magento","Magnetic","Mailchimp","Mandrill","Marketo","MediaMath","Mixpanel","Moat Analytics","Mobile Action","MongoDB","MS SQL Server","MyAffiliates","MySQL","Netbase","Netsuite","Nuviad","Oath","Oracle","Outbrain","Pardot by Salesforce","Picasso Labs","Pinterest Ads","Pipedrive","PostgreSQL","Recurly","Redis","Rest","Revcontent","Salesforce","Salesforce Audience Studio (DMP)","Salesforce Desk","Search Ads 360","Segment","Sendgrid","SensorTower","ServiceNow","SFTP (Secure FTP)","ShareASale","ShipHero","Shopify","Slack","Snapchat Ads","Social Studio by Salesforce","Socialbakers","SpotX","Sprinklr","StreamRail","Stripe","Survey Gizmo","SurveyMonkey","Taboola","The Trade Desk","Tiger Pistol","Trendkite","Twitter Ads","VertaMedia","Voluum","Webhook","Yahoo Gemini","Yotpo","YouTube Reporting","Zendesk","Zendesk Chat","Zendesk Talk","Amazon Redshift","Amazon S3","Azure Blob Storage","Azure Data Lake Analytics","Azure SQL Data Warehouse","Google BigQuery","Google Cloud Storage","Snowflake","Treasure Data"];
+    
+const fuse = new Fuse(integrations)
+
 window.addEventListener('load', function () {
+
+    function createItemTile(value, indices) {
+      return `${indices.reduce(
+            (acc, [s, e]) => `${acc}<strong>${value.substring(s, e + 1)}</strong>`,
+            value.substring(0, indices[0][0])
+          )}${value.substring(indices[indices.length - 1][1] + 1)}`;
+    }
 
     function autocomplete(inp, arr) {
       /*the autocomplete function takes two arguments,
@@ -20,30 +34,35 @@ window.addEventListener('load', function () {
           a.setAttribute("class", "autocomplete-items");
           /*append the DIV element as a child of the autocomplete container:*/
           this.parentNode.appendChild(a);
+
+          /*search for matches*/
+          const results = fuse.search(val);
+
           /*for each item in the array...*/
-          for (i = 0; i < arr.length; i++) {
-            /*check if the item starts with the same letters as the text field value:*/
-            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-              /*create a DIV element for each matching element:*/
-              b = document.createElement("DIV");
-              b.setAttribute("class", "autocomplete-item");
-              /*make the matching letters bold:*/
-              b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-              b.innerHTML += arr[i].substr(val.length);
-              /*insert a input field that will hold the current array item's value:*/
-              b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-              /*execute a function when someone clicks on the item value (DIV element):*/
-              b.addEventListener("click", function(e) {
-                  /*insert the value for the autocomplete text field:*/
-                  inp.value = this.getElementsByTagName("input")[0].value;
-                  $('#search').click();
-                  /*close the list of autocompleted values,
-                  (or any other open lists of autocompleted values:*/
-                  closeAllLists();
-              });
-              a.appendChild(b);
-            }
+          for (const result of results) {
+            /*create a DIV element for each matching element:*/
+            b = document.createElement("DIV");
+            b.setAttribute("class", "autocomplete-item");
+            /*make the matching letters bold:*/
+            b.innerHTML = createItemTile(result.item, result.matches[0].indices)
+
+            // b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+            // b.innerHTML += arr[i].substr(val.length);
+            /*insert a input field that will hold the current array item's value:*/
+            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+            /*execute a function when someone clicks on the item value (DIV element):*/
+            b.addEventListener("click", function(e) {
+                /*insert the value for the autocomplete text field:*/
+                inp.value = this.getElementsByTagName("input")[0].value;
+                $('#search').click();
+                /*close the list of autocompleted values,
+                (or any other open lists of autocompleted values:*/
+                closeAllLists();
+            });
+            
+            a.appendChild(b);
           }
+
           if(a.hasChildNodes()) {
             a.style.visibility = 'visible';
           } else {
@@ -109,9 +128,6 @@ window.addEventListener('load', function () {
 
       closeAllLists();
     }
-    
-    /*An array containing all the names*/
-    var integrations = ["Adaptive Insights","AdapTV","adjust","Adobe Ads","Adobe Analytics","Adquant","Adroll","Airtable","Amplitude","Anaplan","App Store Connect – Analytics","App Store Connect – Sales","Apple Search Ads","AppNexus","Appreciate","Appsee","AppsFlyer","Avantlink","Bing Ads","BlueSnap","Brandwatch","Cassandra","Cedato","Chargify","Convert Media","CouchBase","Crimson Hexagon","Criteo","Currency Service","Customer Gauge","Delta Projects","Display & Video 360","Docebo","DoubleClick","DoubleVerify","Facebook Ads","Facebook Audience Network","Facebook Social","FTP","GMP365","Google Ad Manager","Google Ads","Google AdWords","Google Analytics","Google Data Store","Google Email","Google Play","Google Sheets","Gothamads","Greenhouse","Harvest","HasOffers","HelpScout","Hubspot","Impact Radius","Index Exchange Client Audit Logs","Innovid","Insight Squared","Instagram","Intacct","Intercom","Jira","JW Player","JW Player Analytics","Keepcon","Klaviyo","Kochava","Linkedin Ads","Linkedin Social","LKQD","Magento","Magnetic","Mailchimp","Mandrill","Marketo","MediaMath","Mixpanel","Moat Analytics","Mobile Action","MongoDB","MS SQL Server","MyAffiliates","MySQL","Netbase","Netsuite","Nuviad","Oath","Oracle","Outbrain","Pardot by Salesforce","Picasso Labs","Pinterest Ads","Pipedrive","PostgreSQL","Recurly","Redis","Rest","Revcontent","Salesforce","Salesforce Audience Studio (DMP)","Salesforce Desk","Search Ads 360","Segment","Sendgrid","SensorTower","ServiceNow","SFTP (Secure FTP)","ShareASale","ShipHero","Shopify","Slack","Snapchat Ads","Social Studio by Salesforce","Socialbakers","SpotX","Sprinklr","StreamRail","Stripe","Survey Gizmo","SurveyMonkey","Taboola","The Trade Desk","Tiger Pistol","Trendkite","Twitter Ads","VertaMedia","Voluum","Webhook","Yahoo Gemini","Yotpo","YouTube Reporting","Zendesk","Zendesk Chat","Zendesk Talk","Amazon Redshift","Amazon S3","Azure Blob Storage","Azure Data Lake Analytics","Azure SQL Data Warehouse","Google BigQuery","Google Cloud Storage","Snowflake","Treasure Data"];
     
     /*initiate the autocomplete function on the "myInput" element, and pass along the integrations array as possible autocomplete values:*/
     autocomplete(document.getElementById("my-input"), integrations);
