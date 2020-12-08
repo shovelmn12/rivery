@@ -12,9 +12,9 @@ window.addEventListener('load', function () {
           )}${value.substring(indices[indices.length - 1][1] + 1)}`;
     }
 
-    function addItemTile(parent, value, indices) {
+    function addItemTile(parent, onClick, value, indices) {
       /*create a DIV element for each matching element:*/
-      b = document.createElement("DIV");
+      const b = document.createElement("DIV");
       b.setAttribute("class", "autocomplete-item");
 
       /*make the matching letters bold:*/
@@ -23,14 +23,7 @@ window.addEventListener('load', function () {
       /*insert a input field that will hold the current array item's value:*/
       b.innerHTML += "<input type='hidden' value='" + value + "'>";
       /*execute a function when someone clicks on the item value (DIV element):*/
-      b.addEventListener("click", function(e) {
-          /*insert the value for the autocomplete text field:*/
-          inp.value = this.getElementsByTagName("input")[0].value;
-          $('#search').click();
-          /*close the list of autocompleted values,
-          (or any other open lists of autocompleted values:*/
-          closeAllLists();
-      });
+      b.addEventListener("click", onClick);
       
       parent.appendChild(b);
     }
@@ -39,17 +32,27 @@ window.addEventListener('load', function () {
       /*the autocomplete function takes two arguments,
       the text field element and an array of possible autocompleted values:*/
       var currentFocus;
+
+      function onItemTileClick() {
+        /*insert the value for the autocomplete text field:*/
+        inp.value = this.getElementsByTagName("input")[0].value;
+        $('#search').click();
+        /*close the list of autocompleted values,
+        (or any other open lists of autocompleted values:*/
+        closeAllLists();
+      }
+
       /*execute a function when someone writes in the text field:*/
       inp.addEventListener("input", function(e) {
             $('#result-box').hide();
-          var a, b, i, val = this.value;
+          const val = this.value;
           /*close any already open lists of autocompleted values*/
           /*close any already open lists of autocompleted values*/
           closeAllLists();
           if (!val) { return false;}
           currentFocus = -1;
           /*create a DIV element that will contain the items (values):*/
-          a = document.createElement("DIV");
+          const a = document.createElement("DIV");
           a.style.visibility = 'hidden';   
           a.setAttribute("id", this.id + "autocomplete-list");
           a.setAttribute("class", "autocomplete-items");
@@ -60,12 +63,12 @@ window.addEventListener('load', function () {
           const results = fuse.search(val);
 
           if (results.find((result) => result.item === val) === undefined && integrations.find((item) => item === val) === undefined) {
-            addItemTile(a, val, [[0, val.length]]);
+            addItemTile(a, onItemTileClick, val, [[0, val.length]]);
           }
 
           /*for each item in the array...*/
           for (const result of results) {
-            addItemTile(a, result.item, result.matches[0].indices);
+            addItemTile(a, onItemTileClick, result.item, result.matches[0].indices);
           }
 
           if(a.hasChildNodes()) {
