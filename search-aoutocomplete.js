@@ -12,6 +12,29 @@ window.addEventListener('load', function () {
           )}${value.substring(indices[indices.length - 1][1] + 1)}`;
     }
 
+    function addItemTile(parent, value, indices) {
+      /*create a DIV element for each matching element:*/
+      b = document.createElement("DIV");
+      b.setAttribute("class", "autocomplete-item");
+
+      /*make the matching letters bold:*/
+      b.innerHTML = createItemTile(value, indices);
+
+      /*insert a input field that will hold the current array item's value:*/
+      b.innerHTML += "<input type='hidden' value='" + value + "'>";
+      /*execute a function when someone clicks on the item value (DIV element):*/
+      b.addEventListener("click", function(e) {
+          /*insert the value for the autocomplete text field:*/
+          inp.value = this.getElementsByTagName("input")[0].value;
+          $('#search').click();
+          /*close the list of autocompleted values,
+          (or any other open lists of autocompleted values:*/
+          closeAllLists();
+      });
+      
+      parent.appendChild(b);
+    }
+
     function autocomplete(inp, arr) {
       /*the autocomplete function takes two arguments,
       the text field element and an array of possible autocompleted values:*/
@@ -36,29 +59,13 @@ window.addEventListener('load', function () {
           /*search for matches*/
           const results = fuse.search(val);
 
+          if (results.find((result)=> result.item === val) === undefined && integrations.find((item)=> item === val) !== undefined) {
+            addItemTile(a, val, [0, val.length]);
+          }
+
           /*for each item in the array...*/
           for (const result of results) {
-            /*create a DIV element for each matching element:*/
-            b = document.createElement("DIV");
-            b.setAttribute("class", "autocomplete-item");
-            /*make the matching letters bold:*/
-            b.innerHTML = createItemTile(result.item, result.matches[0].indices)
-
-            // b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-            // b.innerHTML += arr[i].substr(val.length);
-            /*insert a input field that will hold the current array item's value:*/
-            b.innerHTML += "<input type='hidden' value='" + result.item + "'>";
-            /*execute a function when someone clicks on the item value (DIV element):*/
-            b.addEventListener("click", function(e) {
-                /*insert the value for the autocomplete text field:*/
-                inp.value = this.getElementsByTagName("input")[0].value;
-                $('#search').click();
-                /*close the list of autocompleted values,
-                (or any other open lists of autocompleted values:*/
-                closeAllLists();
-            });
-            
-            a.appendChild(b);
+            addItemTile(a, result.item, result.matches[0].indices);
           }
 
           if(a.hasChildNodes()) {
