@@ -59,7 +59,7 @@ window.addEventListener('load', function () {
           /*search for matches*/
           const results = fuse.search(val);
 
-          if (results.find((result)=> result.item === val) === undefined && integrations.find((item)=> item === val) !== undefined) {
+          if (results.find((result) => result.item === val) === undefined && integrations.find((item) => item === val) === undefined) {
             addItemTile(a, val, [0, val.length]);
           }
 
