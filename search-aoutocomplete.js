@@ -20,7 +20,7 @@ window.addEventListener('load', function () {
         }
       );
   
-      return `${value}: ${result}`;
+      return result;
     }
 
     function addItemTile(parent, onClick, value, indices) {
