@@ -6,10 +6,21 @@ const fuse = new Fuse(integrations, { includeMatches: true })
 window.addEventListener('load', function () {
 
     function createItemTile(value, indices) {
-      return `${indices.reduce(
-            (acc, [s, e]) => `${acc}<strong>${value.substring(s, e + 1)}</strong>`,
-            value.substring(0, indices[0][0])
-          )}${value.substring(indices[indices.length - 1][1] + 1)}`;
+      const { value: result } = indices.reduce(
+        ({ value, offset }, [s, e]) => ({
+          value: `${value.substring(0, s + offset)}<strong>${value.substring(
+            s + offset,
+            e + 1 + offset
+          )}</strong>${value.substring(e + 1 + offset)}`,
+          offset: offset + 17
+        }),
+        {
+          value,
+          offset: 0
+        }
+      );
+  
+      return `${value}: ${result}`;
     }
 
     function addItemTile(parent, onClick, value, indices) {
